@@ -556,6 +556,97 @@
 
           </div>
 
+          <!-- Account & Preferences View (Scrollable, Hidden by default) -->
+          <div class="scroll-content tab-view" id="accountView" style="display: none;">
+            
+            <!-- Profile Hero Area -->
+            <div class="section-container">
+              <div class="profile-hero-card">
+                <div class="profile-avatar-frame">
+                  <span class="profile-avatar-letter">A</span>
+                  <div class="profile-avatar-glow"></div>
+                </div>
+                <h2 class="profile-name">Dr. Alam</h2>
+                <p class="profile-role">Chief Embryologist & Lab Director</p>
+                <div class="profile-badge">
+                  <i data-lucide="shield-check"></i>
+                  <span>Admin Authorization</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Application Settings & Theme Switcher -->
+            <div class="section-container" style="padding-top: 0; padding-bottom: 12px;">
+              <h2 class="section-title">Clinical Preferences</h2>
+              <div class="maintenance-options-card">
+                
+                <!-- Toggle Item: Light Theme Switcher -->
+                <div class="menu-toggle-item">
+                  <div class="menu-item-info">
+                    <span class="menu-item-title">Soft Clinical Light Theme</span>
+                    <span class="menu-item-desc">High-contrast soft blue palette for daylight</span>
+                  </div>
+                  <label class="switch">
+                    <input type="checkbox" id="toggleTheme">
+                    <span class="slider round"></span>
+                  </label>
+                </div>
+
+                <!-- Toggle Item: Biometrics -->
+                <div class="menu-toggle-item">
+                  <div class="menu-item-info">
+                    <span class="menu-item-title">Face ID / Biometric Access</span>
+                    <span class="menu-item-desc">Secure clinical diagnostic overlays</span>
+                  </div>
+                  <label class="switch">
+                    <input type="checkbox" id="toggleBiometrics" checked>
+                    <span class="slider round"></span>
+                  </label>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Clinical Information & Metadata -->
+            <div class="section-container" style="padding-top: 0; padding-bottom: 12px;">
+              <h2 class="section-title">Security & Access Logs</h2>
+              <div class="config-settings-card">
+                
+                <!-- Access Log Item 1 -->
+                <div class="slider-config-row" style="padding: 12px 0; border-bottom: 1px solid var(--border-frosted); margin-bottom: 0;">
+                  <div class="slider-meta" style="flex: 1;">
+                    <div class="slider-label-group">
+                      <span class="config-item-title" style="font-size: 13px;">Last Login Session</span>
+                      <span class="config-item-desc">May 21, 2026 at 22:35 from IVF Terminal 4</span>
+                    </div>
+                  </div>
+                  <span class="mini-badge-live" style="background: rgba(16, 185, 129, 0.08); color: var(--status-safe); border: 1px solid rgba(16, 185, 129, 0.2);">ACTIVE</span>
+                </div>
+
+                <!-- Access Log Item 2 -->
+                <div class="slider-config-row" style="padding: 12px 0; margin-bottom: 0;">
+                  <div class="slider-meta" style="flex: 1;">
+                    <div class="slider-label-group">
+                      <span class="config-item-title" style="font-size: 13px;">Database Synchronization</span>
+                      <span class="config-item-desc">Sync completed successfully</span>
+                    </div>
+                  </div>
+                  <span class="mini-badge-live" style="background: var(--primary-bg); color: var(--primary); border: 1px solid var(--border-active);">OK</span>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Version Signature -->
+            <div class="section-container pb-32" style="padding-top: 0; text-align: center;">
+              <div style="opacity: 0.45; font-size: 11px; font-family: var(--font-body); letter-spacing: 0.5px; padding-top: 24px;">
+                AeroGuard OS v3.5.12-prod<br>
+                Biomoneta ZeBox Sync Engine
+              </div>
+            </div>
+
+          </div>
+
           <!-- Bottom Pull-Up Bottom Sheet Panel (e.g. Notifications) -->
           <div class="bottom-sheet-overlay" id="bottomSheetOverlay"></div>
           <div class="bottom-sheet" id="notificationSheet">
@@ -623,6 +714,12 @@
                 <i data-lucide="sliders"></i>
               </div>
               <span class="tab-label">Settings</span>
+            </a>
+            <a href="#" class="nav-tab" data-tab="account">
+              <div class="tab-icon-wrapper">
+                <i data-lucide="user"></i>
+              </div>
+              <span class="tab-label">Account</span>
             </a>
           </nav>
 

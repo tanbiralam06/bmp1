@@ -4,7 +4,7 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-  
+
   // ==========================================================================
   // ROOM CONFIGURATION DATA & STATES
   // ==========================================================================
@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
   }
-  
+
   // Layout 2 State Variables
   let trendsChartInstance = null;
   let activeParam = 'cfu';
@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const safetyScoreText = document.getElementById('safetyScoreText');
   const safetyStatusText = document.getElementById('safetyStatusText');
   const activeRoomLabel = document.getElementById('activeRoomLabel');
-  
+
   // Telemetry elements
   const metricCfu = document.getElementById('metricCfu');
   const metricCo2 = document.getElementById('metricCo2');
@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ==========================================================================
   // INITIALIZATION
   // ==========================================================================
-  
+
   function init() {
     // Graceful Lucide Icons fallback
     if (typeof lucide !== 'undefined') {
@@ -151,23 +151,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     updateClock();
     setInterval(updateClock, 1000);
-    
+
     // Initialize Layout 2 Interactive Charts
     try {
       initChart();
     } catch (err) {
       console.error("Chart.js failed to initialize:", err);
     }
-    
+
     // Set active room configurations
     loadRoomState(currentRoomKey);
-    
+
     // Initialize Layout 3 Interactive AI Chat
     initAiChat();
-    
+
     // Attach Event Listeners
     setupEventListeners();
-    
+
     // Start dynamic sensor simulations
     startSensorSimulation();
   }
@@ -188,19 +188,19 @@ document.addEventListener('DOMContentLoaded', () => {
   // ==========================================================================
   // SAFETY GAUGE MATHEMATICS (Ring Stroke Dash Offset)
   // ==========================================================================
-  
+
   function updateSafetyGauge(score) {
     if (!safetyGaugeFill) return;
     const radius = 85;
     const circumference = 2 * Math.PI * radius; // Approx 534.07
-    
+
     const offset = circumference - (score / 100) * circumference;
-    
+
     safetyGaugeFill.style.strokeDasharray = `${circumference}`;
     safetyGaugeFill.style.strokeDashoffset = `${offset}`;
-    
+
     animateNumberCounter(safetyScoreText, parseInt(safetyScoreText.textContent) || 0, score);
-    
+
     const glow = document.querySelector('.gauge-glow-effect');
     if (score >= 95) {
       safetyGaugeFill.style.stroke = 'var(--primary)';
@@ -253,26 +253,26 @@ document.addEventListener('DOMContentLoaded', () => {
   // ==========================================================================
   // ROOM STATE LOADER
   // ==========================================================================
-  
+
   function loadRoomState(roomKey) {
     currentRoomKey = roomKey;
     activeState = { ...ROOM_DATA[roomKey] };
-    
+
     // Update labels across BOTH layouts
     activeRoomLabel.textContent = activeState.name;
     const analyticsLabel = document.getElementById('activeRoomLabelAnalytics');
     if (analyticsLabel) analyticsLabel.textContent = activeState.name;
-    
+
     // Synchronize both sets of room pills (Dashboard + Analytics)
     document.querySelectorAll(`.room-pill[data-room="${roomKey}"]`).forEach(btn => {
       const parent = btn.parentElement;
       parent.querySelectorAll('.room-pill').forEach(p => p.classList.remove('active'));
       btn.classList.add('active');
     });
-    
+
     // Update dial safety index
     updateSafetyGauge(activeState.score);
-    
+
     // Load physical telemetry values
     metricCfu.textContent = activeState.cfu;
     metricCo2.textContent = activeState.co2;
@@ -280,7 +280,7 @@ document.addEventListener('DOMContentLoaded', () => {
     metricTvoc.textContent = activeState.tvoc;
     metricTemp.textContent = activeState.temp.toFixed(1);
     metricHumid.textContent = activeState.humid;
-    
+
     // Recalibrate Badges depending on values
     updateTelemetryBadges();
 
@@ -310,11 +310,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Sync ACH Speed Level state
     updateFanSpeedUI(activeState.fan);
-    
+
     // Layout 2 Update Actions
     populateLogsFeed(roomKey);
     updateChartData();
-    
+
     // Layout 3 Update Actions
     const aiLabel = document.getElementById('activeRoomLabelAi');
     if (aiLabel) aiLabel.textContent = activeState.name;
@@ -333,7 +333,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const co2Val = document.getElementById('co2ThresholdVal');
     const pm25Slider = document.getElementById('pm25ThresholdSlider');
     const pm25Val = document.getElementById('pm25ThresholdVal');
-    
+
     if (co2Slider && co2Val) {
       co2Slider.value = activeState.co2Threshold || 600;
       co2Val.textContent = `${co2Slider.value} ppm`;
@@ -346,7 +346,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const filterBar = document.getElementById('filterBarFill');
     const filterText = document.getElementById('filterPercentText');
     const filterEst = document.querySelector('.filter-estimate');
-    
+
     if (filterBar && filterText) {
       const life = activeState.filterLife || 87;
       filterBar.style.width = `${life}%`;
@@ -355,7 +355,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const days = Math.round(life * 2.8); // estimate days left based on life %
         filterEst.textContent = `Est. replacement in ${days} days`;
       }
-      
+
       if (life > 50) {
         filterBar.style.background = 'linear-gradient(90deg, var(--primary-dark) 0%, var(--primary) 100%)';
       } else if (life > 20) {
@@ -436,7 +436,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const frame = cardFan.querySelector('.icon-frame');
-    
+
     if (speed === 1) { // Min
       statusTextFan.textContent = "Silent Shield Mode (4.0 ACH)";
       fanIcon.className = "control-icon spin-slow";
@@ -459,7 +459,7 @@ document.addEventListener('DOMContentLoaded', () => {
       frame.classList.remove('fan-active');
       cardFan.classList.remove('active-state');
     }
-    
+
     if (speed !== 3) {
       fanIcon.style.animationDuration = '';
     }
@@ -468,11 +468,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // ==========================================================================
   // LAYOUT 2: CHARTJS INTEGRATION & DYNAMIC UPDATING
   // ==========================================================================
-  
+
   function initChart() {
     const canvas = document.getElementById('trendsChart');
     if (!canvas) return;
-    
+
     if (typeof Chart === 'undefined') {
       console.warn("Chart.js not loaded. Displaying offline trends placeholder.");
       const wrapper = canvas.parentElement;
@@ -501,14 +501,14 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       return;
     }
-    
+
     const ctx = canvas.getContext('2d');
-    
+
     // Set custom visual gradient fill representing the brand
     const gradientFill = ctx.createLinearGradient(0, 0, 0, 180);
     gradientFill.addColorStop(0, 'rgba(169, 189, 61, 0.22)');
     gradientFill.addColorStop(1, 'rgba(169, 189, 61, 0.00)');
-    
+
     const config = {
       type: 'line',
       data: {
@@ -544,7 +544,7 @@ document.addEventListener('DOMContentLoaded', () => {
             titleFont: { family: 'Outfit', size: 10 },
             bodyFont: { family: 'Inter', weight: 'bold', size: 13 },
             callbacks: {
-              label: function(context) {
+              label: function (context) {
                 let val = context.parsed.y;
                 let unit = getUnitForParam(activeParam);
                 return `${val} ${unit}`;
@@ -564,8 +564,37 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
     };
-    
+
     trendsChartInstance = new Chart(ctx, config);
+  }
+
+  function syncChartTheme(isLight) {
+    if (!trendsChartInstance) return;
+
+    const tooltip = trendsChartInstance.options.plugins.tooltip;
+    const scales = trendsChartInstance.options.scales;
+
+    if (isLight) {
+      tooltip.backgroundColor = '#FFFFFF';
+      tooltip.bodyColor = '#1E293B';
+      tooltip.borderColor = 'rgba(0, 0, 0, 0.08)';
+      scales.x.ticks.color = '#475569';
+      scales.y.ticks.color = '#475569';
+      scales.y.grid.color = 'rgba(0, 0, 0, 0.06)';
+
+      trendsChartInstance.data.datasets[0].pointBorderColor = '#FFFFFF';
+    } else {
+      tooltip.backgroundColor = '#131A27';
+      tooltip.bodyColor = '#FFFFFF';
+      tooltip.borderColor = 'rgba(255,255,255,0.06)';
+      scales.x.ticks.color = '#8E9BAF';
+      scales.y.ticks.color = '#8E9BAF';
+      scales.y.grid.color = 'rgba(255, 255, 255, 0.04)';
+
+      trendsChartInstance.data.datasets[0].pointBorderColor = '#111724';
+    }
+
+    trendsChartInstance.update();
   }
 
   function getUnitForParam(param) {
@@ -672,36 +701,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateChartData() {
     if (!trendsChartInstance) return;
-    
+
     // Fallback in case period 'custom' is active
     let periodKey = activePeriod === 'custom' ? '7d' : activePeriod;
-    
+
     // Get dataset
     const roomDataset = CHART_DATABASE[currentRoomKey];
     if (!roomDataset) return;
-    
+
     const paramDataset = roomDataset[activeParam];
     if (!paramDataset) return;
-    
+
     const plotData = paramDataset[periodKey];
     if (!plotData) return;
-    
+
     // Adjust colors depending on parameter
     const glowColor = getChartColorForParam(activeParam);
     trendsChartInstance.data.datasets[0].borderColor = glowColor;
     trendsChartInstance.data.datasets[0].pointBackgroundColor = glowColor;
-    
+
     // Recreate area gradient fill with new color
     const ctx = document.getElementById('trendsChart').getContext('2d');
     const newGradient = ctx.createLinearGradient(0, 0, 0, 180);
     newGradient.addColorStop(0, hexToRgba(glowColor, 0.22));
     newGradient.addColorStop(1, hexToRgba(glowColor, 0.00));
     trendsChartInstance.data.datasets[0].backgroundColor = newGradient;
-    
+
     // Load labels and values
     trendsChartInstance.data.labels = plotData.labels;
     trendsChartInstance.data.datasets[0].data = plotData.values;
-    
+
     // Trigger animated chart update
     trendsChartInstance.update('active');
   }
@@ -727,7 +756,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ==========================================================================
   // HISTORICAL EVENT LOG GENERATOR (Layout 2 Feed list)
   // ==========================================================================
-  
+
   const HISTORICAL_LOGS_DB = {
     ivf_ot: [
       { type: 'safe', title: 'Optimal Pathogen Clearance', desc: 'Bacterial load dropped to 4 CFU/m³ following maximum ACH cycle.', time: '14:20 PM', val: '4 CFU' },
@@ -754,19 +783,19 @@ document.addEventListener('DOMContentLoaded', () => {
   function populateLogsFeed(roomKey) {
     const feed = document.getElementById('logsFeed');
     if (!feed) return;
-    
+
     feed.innerHTML = '';
     const logs = HISTORICAL_LOGS_DB[roomKey] || [];
-    
+
     logs.forEach(log => {
       const card = document.createElement('div');
       card.className = 'log-card';
-      
+
       let icon = 'shield-check';
       if (log.type === 'warn') icon = 'alert-triangle';
       if (log.type === 'danger') icon = 'alert-octagon';
       if (log.type === 'info') icon = 'info';
-      
+
       card.innerHTML = `
         <div class="log-meta-group">
           <div class="log-status-dot-frame ${log.type}">
@@ -784,7 +813,7 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
       feed.appendChild(card);
     });
-    
+
     // Instruct Lucide to draw the icons inside the newly generated DOM elements!
     lucide.createIcons();
   }
@@ -792,9 +821,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // ==========================================================================
   // EVENT HANDLERS & BINDINGS
   // ==========================================================================
-  
+
   function setupEventListeners() {
-    
+
     // 1. Room pill switches (Dashboard & Analytics)
     const pills = document.querySelectorAll('.room-pill');
     pills.forEach(pill => {
@@ -809,16 +838,16 @@ document.addEventListener('DOMContentLoaded', () => {
     toggleUv.addEventListener('change', (e) => {
       const active = e.target.checked;
       activeState.uv = active;
-      
+
       const frame = cardUv.querySelector('.icon-frame');
       const icon = cardUv.querySelector('.control-icon');
-      
+
       if (active) {
         cardUv.classList.add('active-state');
         statusTextUv.textContent = "Active & Sanitizing";
         frame.classList.add('uv-active');
         icon.classList.add('spin-slow');
-        
+
         activeState.score = Math.min(activeState.score + 5, 100);
         updateSafetyGauge(activeState.score);
       } else {
@@ -826,7 +855,7 @@ document.addEventListener('DOMContentLoaded', () => {
         statusTextUv.textContent = "Inactive / Off";
         frame.classList.remove('uv-active');
         icon.classList.remove('spin-slow');
-        
+
         activeState.score = Math.max(activeState.score - 8, 40);
         updateSafetyGauge(activeState.score);
       }
@@ -836,7 +865,7 @@ document.addEventListener('DOMContentLoaded', () => {
     toggleSilent.addEventListener('change', (e) => {
       const active = e.target.checked;
       activeState.silent = active;
-      
+
       if (active) {
         cardSilent.classList.add('active-state');
         statusTextSilent.textContent = "Low Noise engaged";
@@ -858,7 +887,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const speed = parseInt(btn.getAttribute('data-speed'));
         activeState.fan = speed;
         updateFanSpeedUI(speed);
-        
+
         if (speed === 3 && toggleSilent.checked) {
           toggleSilent.checked = false;
           toggleSilent.dispatchEvent(new Event('change'));
@@ -887,19 +916,19 @@ document.addEventListener('DOMContentLoaded', () => {
       tab.addEventListener('click', (e) => {
         e.preventDefault();
         const targetTab = tab.getAttribute('data-tab');
-        
+
         // Block unused settings tab in Layouts 1, 2 & 3
-        if (targetTab !== 'dashboard' && targetTab !== 'analytics' && targetTab !== 'ai' && targetTab !== 'settings') return;
-        
+        if (targetTab !== 'dashboard' && targetTab !== 'analytics' && targetTab !== 'ai' && targetTab !== 'settings' && targetTab !== 'account') return;
+
         tabs.forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
-        
+
         // Hide views
         document.querySelectorAll('.tab-view').forEach(view => {
           view.classList.remove('active-view');
           view.style.display = 'none';
         });
-        
+
         // Swap views
         if (targetTab === 'dashboard') {
           const v = document.getElementById('dashboardView');
@@ -932,8 +961,14 @@ document.addEventListener('DOMContentLoaded', () => {
             v.classList.add('active-view');
             syncSettingsPageUI();
           }, 10);
+        } else if (targetTab === 'account') {
+          const v = document.getElementById('accountView');
+          v.style.display = 'block';
+          setTimeout(() => {
+            v.classList.add('active-view');
+          }, 10);
         }
-        
+
         triggerHaptic(10);
       });
     });
@@ -944,7 +979,7 @@ document.addEventListener('DOMContentLoaded', () => {
       pill.addEventListener('click', () => {
         timePills.forEach(p => p.classList.remove('active'));
         pill.classList.add('active');
-        
+
         activePeriod = pill.getAttribute('data-period');
         updateChartData();
         triggerHaptic(8);
@@ -957,9 +992,9 @@ document.addEventListener('DOMContentLoaded', () => {
       chip.addEventListener('click', () => {
         paramChips.forEach(c => c.classList.remove('active'));
         chip.classList.add('active');
-        
+
         activeParam = chip.getAttribute('data-param');
-        
+
         // Update Chart Title Card
         const titleText = document.getElementById('chartTitleText');
         if (titleText) {
@@ -968,7 +1003,7 @@ document.addEventListener('DOMContentLoaded', () => {
           if (activeParam === 'co2') titleText.textContent = "Carbon Dioxide (CO₂)";
           if (activeParam === 'tvoc') titleText.textContent = "Chemical index (TVOC)";
         }
-        
+
         updateChartData();
         triggerHaptic(8);
       });
@@ -979,15 +1014,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (exportBtn) {
       exportBtn.addEventListener('click', () => {
         alert(`Generating and compiling historical report for ${activeState.name} (${activePeriod} duration). Starting CSV download...`);
-        
+
         // Mocking native CSV file trigger
         const headers = ["Timestamp", "Reading Value", "Parameter", "Safety Code"];
         const roomDb = CHART_DATABASE[currentRoomKey][activeParam][activePeriod === 'custom' ? '7d' : activePeriod];
-        
+
         const rows = roomDb.values.map((val, idx) => {
           return [roomDb.labels[idx], val, activeParam.toUpperCase(), activeState.score];
         });
-        
+
         const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
@@ -1030,28 +1065,28 @@ document.addEventListener('DOMContentLoaded', () => {
           showNotificationOverlay("HEPA filter is already at 100% capacity.");
           return;
         }
-        
+
         triggerHaptic([30, 50]);
-        
+
         const filterBar = document.getElementById('filterBarFill');
         const filterText = document.getElementById('filterPercentText');
         const filterEst = document.querySelector('.filter-estimate');
-        
+
         let currentLife = activeState.filterLife || 87;
         activeState.filterLife = 100;
         ROOM_DATA[currentRoomKey].filterLife = 100;
-        
+
         if (filterBar) {
           filterBar.style.width = '100%';
           filterBar.style.background = 'linear-gradient(90deg, var(--primary-dark) 0%, var(--primary) 100%)';
         }
-        
+
         animateNumberCounter(filterText, currentLife, 100);
-        
+
         if (filterEst) {
           filterEst.textContent = "Est. replacement in 280 days";
         }
-        
+
         showNotificationOverlay(`HEPA filter life recalibrated to 100% for ${activeState.name}.`);
       });
     }
@@ -1077,7 +1112,7 @@ document.addEventListener('DOMContentLoaded', () => {
       toggleCalibration.addEventListener('change', (e) => {
         calibrationEnabled = e.target.checked;
         triggerHaptic(15);
-        
+
         if (calBadge) {
           if (calibrationEnabled) {
             calBadge.className = 'calibration-badge green';
@@ -1109,9 +1144,9 @@ document.addEventListener('DOMContentLoaded', () => {
           margin-right: 8px;
           vertical-align: middle;
         "></span><span>Testing Lamps...</span>`;
-        
+
         triggerHaptic(15);
-        
+
         setTimeout(() => {
           btnTestUv.disabled = false;
           btnTestUv.innerHTML = originalContent;
@@ -1138,12 +1173,12 @@ document.addEventListener('DOMContentLoaded', () => {
           margin-right: 8px;
           vertical-align: middle;
         "></span><span>Recalibrating...</span>`;
-        
+
         triggerHaptic(15);
-        
+
         // Temporarily pause the main simulation interval
         clearInterval(telemetryInterval);
-        
+
         // Force ideal values
         activeState.cfu = 0;
         activeState.co2 = 400;
@@ -1151,7 +1186,7 @@ document.addEventListener('DOMContentLoaded', () => {
         activeState.tvoc = 50;
         activeState.temp = 21.0;
         activeState.humid = 45;
-        
+
         // Update UI
         metricCfu.textContent = activeState.cfu;
         metricCo2.textContent = activeState.co2;
@@ -1159,20 +1194,66 @@ document.addEventListener('DOMContentLoaded', () => {
         metricTvoc.textContent = activeState.tvoc;
         metricTemp.textContent = activeState.temp.toFixed(1);
         metricHumid.textContent = activeState.humid;
-        
+
         updateTelemetryBadges();
         recalculateSafetyRating();
         updateAiDiagnosticsUI();
-        
+
         setTimeout(() => {
           btnRecalibrate.disabled = false;
           btnRecalibrate.innerHTML = originalContent;
           showNotificationOverlay("ZeBox sensor matrix recalibrated to sterile baselines.");
           triggerHaptic([30, 10, 30]);
-          
+
           // Resume simulation
           startSensorSimulation();
         }, 2000);
+      });
+    }
+
+    // 16. Clinical Theme Switcher & Caching
+    const toggleTheme = document.getElementById('toggleTheme');
+
+    // Check localStorage cache on load
+    const savedTheme = localStorage.getItem('aeroguard-theme');
+    if (savedTheme === 'light') {
+      document.body.classList.add('light-mode');
+      if (toggleTheme) toggleTheme.checked = true;
+      setTimeout(() => syncChartTheme(true), 250);
+    } else {
+      document.body.classList.remove('light-mode');
+      if (toggleTheme) toggleTheme.checked = false;
+      setTimeout(() => syncChartTheme(false), 250);
+    }
+
+    if (toggleTheme) {
+      toggleTheme.addEventListener('change', () => {
+        const isLight = toggleTheme.checked;
+        if (isLight) {
+          document.body.classList.add('light-mode');
+          localStorage.setItem('aeroguard-theme', 'light');
+          syncChartTheme(true);
+          showNotificationOverlay("Soft clinical light theme active.");
+        } else {
+          document.body.classList.remove('light-mode');
+          localStorage.setItem('aeroguard-theme', 'dark');
+          syncChartTheme(false);
+          showNotificationOverlay("Deep space dark theme active.");
+        }
+        triggerHaptic(12);
+      });
+    }
+
+    // 17. Biometric Face ID Switcher
+    const toggleBiometrics = document.getElementById('toggleBiometrics');
+    if (toggleBiometrics) {
+      toggleBiometrics.addEventListener('change', () => {
+        triggerHaptic(12);
+        if (toggleBiometrics.checked) {
+          showNotificationOverlay("Biometric clinical face lock enabled.");
+        } else {
+          showNotificationOverlay("Biometric clinical security disabled.");
+        }
       });
     }
   }
@@ -1185,17 +1266,17 @@ document.addEventListener('DOMContentLoaded', () => {
   // ==========================================================================
   // REAL-TIME SENSOR TELEMETRY FLUCTUATOR (Simulation ticks)
   // ==========================================================================
-  
+
   function startSensorSimulation() {
     if (telemetryInterval) clearInterval(telemetryInterval);
-    
+
     telemetryInterval = setInterval(() => {
       const randPmChange = (Math.random() - 0.5) * 0.4;
       const randCo2Change = Math.floor((Math.random() - 0.5) * 6);
       const randTvocChange = Math.floor((Math.random() - 0.5) * 4);
       const randTempChange = (Math.random() - 0.5) * 0.1;
       const randHumidChange = Math.floor((Math.random() - 0.5) * 2);
-      
+
       activeState.pm25 = Math.max(0.5, activeState.pm25 + randPmChange);
       activeState.co2 = Math.max(350, activeState.co2 + randCo2Change);
       activeState.tvoc = Math.max(10, activeState.tvoc + randTvocChange);
@@ -1207,26 +1288,26 @@ document.addEventListener('DOMContentLoaded', () => {
         activeState.cfu = Math.max(0, activeState.cfu + randCfuChange);
         metricCfu.textContent = activeState.cfu;
       }
-      
+
       metricPm25.textContent = activeState.pm25.toFixed(1);
       metricCo2.textContent = activeState.co2;
       metricTvoc.textContent = activeState.tvoc;
       metricTemp.textContent = activeState.temp.toFixed(1);
       metricHumid.textContent = activeState.humid;
-      
+
       updateTelemetryBadges();
       recalculateSafetyRating();
       updateAiDiagnosticsUI();
-      
+
     }, 2500);
   }
 
   function recalculateSafetyRating() {
     let score = 100;
-    
+
     if (activeState.cfu > 50) score -= 15;
     else if (activeState.cfu > 10) score -= 5;
-    
+
     if (activeState.pm25 > 15) score -= 12;
     else if (activeState.pm25 > 8) score -= 4;
 
@@ -1236,7 +1317,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!activeState.uv) score -= 8;
 
     score = Math.max(5, Math.min(100, score));
-    
+
     if (activeState.score !== score) {
       activeState.score = score;
       updateSafetyGauge(score);
@@ -1246,7 +1327,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ==========================================================================
   // LAYOUT 3: AI DIAGNOSTICS & CHAT SYSTEM FUNCTIONS
   // ==========================================================================
-  
+
   function updateAiDiagnosticsUI() {
     const aiDiagCfu = document.getElementById('aiDiagCfu');
     const aiDiagAch = document.getElementById('aiDiagAch');
@@ -1368,7 +1449,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const card = document.createElement('div');
       card.className = `recommendation-card ${rec.type}-rec`;
-      
+
       card.innerHTML = `
         <div class="rec-header">
           <div class="rec-icon-frame">
@@ -1393,7 +1474,7 @@ document.addEventListener('DOMContentLoaded', () => {
     list.querySelectorAll('.one-tap-btn:not(.applied)').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const actionType = btn.getAttribute('data-action-type');
-        
+
         if (actionType === 'info') {
           alert("Smart Audit report generated. Real-time telemetry calibration verified as accurate.");
           return;
@@ -1416,7 +1497,7 @@ document.addEventListener('DOMContentLoaded', () => {
           }
 
           loadRoomState(currentRoomKey);
-          
+
           populateAiRecommendations();
           updateAiDiagnosticsUI();
 
@@ -1501,7 +1582,7 @@ document.addEventListener('DOMContentLoaded', () => {
       chip.addEventListener('click', () => {
         const queryType = chip.getAttribute('data-query');
         let userText = "";
-        
+
         if (queryType === 'diagnostic') userText = `⚡ Run diagnostics for ${activeState.name}`;
         if (queryType === 'sterile') userText = `🛡️ Verify sterile index for ${activeState.name}`;
         if (queryType === 'suggest') userText = `💨 Suggest optimal ACH ventilation rate`;
@@ -1517,26 +1598,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
         setTimeout(() => {
           let replyText = "";
-          
+
           if (queryType === 'diagnostic') {
             if (currentRoomKey === 'post_op') {
-              replyText = `⚠️ **Critical Diagnostic Warning for ${activeState.name}**: Pathogen levels are high at **${activeState.cfu} CFU/m³** (limit is <=10). Particulate load is poor at **${activeState.pm25.toFixed(1)} µg/m³**. Smart recommendation: Engage UV-C boost and set ACH fan speed to Maximum Sanitization.`;
+              replyText = `⚠️ Critical Diagnostic Warning for ${activeState.name}: Pathogen levels are high at ${activeState.cfu} CFU/m³ (limit is <=10). Particulate load is poor at ${activeState.pm25.toFixed(1)} µg/m³. Smart recommendation: Engage UV-C boost and set ACH fan speed to Maximum Sanitization.`;
             } else if (currentRoomKey === 'nicu') {
-              replyText = `✨ **NICU Diagnostic: Perfect Sterile State**. Paths score is **99%**. Biological loading is extremely low at **${activeState.cfu} CFU/m³** and dust particles are optimal at **${activeState.pm25.toFixed(1)} µg/m³**. Silent Protection mode is active at 32dB to maintain noise limits. No manual actions needed.`;
+              replyText = `✨ NICU Diagnostic: Perfect Sterile State. Paths score is 99%. Biological loading is extremely low at ${activeState.cfu} CFU/m³ and dust particles are optimal at ${activeState.pm25.toFixed(1)} µg/m³. Silent Protection mode is active at 32dB to maintain noise limits. No manual actions needed.`;
             } else {
-              replyText = `🛡️ **Diagnostics for ${activeState.name}**: Pathogen protection score is **${activeState.score}%** (Safe Status). CFU index is secure at **${activeState.cfu} CFU/m³** and CO₂ levels are optimal at **${activeState.co2} ppm**. Mechanical functions are calibrated correctly.`;
+              replyText = `🛡️ Diagnostics for ${activeState.name}: Pathogen protection score is ${activeState.score}% (Safe Status). CFU index is secure at ${activeState.cfu} CFU/m³ and CO₂ levels are optimal at ${activeState.co2} ppm. Mechanical functions are calibrated correctly.`;
             }
           } else if (queryType === 'sterile') {
             if (activeState.cfu <= 10 && activeState.pm25 <= 8) {
-              replyText = `🛡️ **Sterility Audit: SECURE**. Active load in **${activeState.name}** is **${activeState.cfu} CFU/m³** (clinical safe limit is <=10) and PM2.5 density is clean at **${activeState.pm25.toFixed(1)} µg/m³**. The environment meets sterile clinical guidelines.`;
+              replyText = `🛡️ Sterility Audit: SECURE. Active load in ${activeState.name} is ${activeState.cfu} CFU/m³ (clinical safe limit is <=10) and PM2.5 density is clean at ${activeState.pm25.toFixed(1)} µg/m³. The environment meets sterile clinical guidelines.`;
             } else {
-              replyText = `⚠️ **Sterility Audit: EXCEEDED**. Pathogen load is **${activeState.cfu} CFU/m³** (Clinical limit <=10) and PM2.5 particulate count is **${activeState.pm25.toFixed(1)} µg/m³**. Pathogen indices fail sterility rating. Engage smart action buttons to enforce safety protocols.`;
+              replyText = `⚠️ Sterility Audit: EXCEEDED. Pathogen load is ${activeState.cfu} CFU/m³ (Clinical limit <=10) and PM2.5 particulate count is ${activeState.pm25.toFixed(1)} µg/m³. Pathogen indices fail sterility rating. Engage smart action buttons to enforce safety protocols.`;
             }
           } else if (queryType === 'suggest') {
             if (activeState.cfu > 10 || activeState.pm25 > 10 || activeState.co2 > 600) {
-              replyText = `💨 **Ventilation Suggestion**: Current room air volume is running at **${activeState.fan === 1 ? '4.0' : activeState.fan === 2 ? '8.5' : '12.0'} ACH**. Due to slight parameter drift (CO₂: ${activeState.co2} ppm, Bacterial: ${activeState.cfu} CFU), I suggest elevating ventilation exchanges to **Maximum Speed (12.0 ACH)** to increase molecular purification speed.`;
+              replyText = `💨 Ventilation Suggestion: Current room air volume is running at ${activeState.fan === 1 ? '4.0' : activeState.fan === 2 ? '8.5' : '12.0'} ACH. Due to slight parameter drift (CO₂: ${activeState.co2} ppm, Bacterial: ${activeState.cfu} CFU), I suggest elevating ventilation exchanges to Maximum Speed (12.0 ACH) to increase molecular purification speed.`;
             } else {
-              replyText = `💨 **Ventilation Suggestion**: Air exchange rate is running at **${activeState.fan === 1 ? '4.0' : activeState.fan === 2 ? '8.5' : '12.0'} ACH**. Current CO₂ load is optimal at **${activeState.co2} ppm**. Standard Auto Mode is highly sufficient for this baseline.`;
+              replyText = `💨 Ventilation Suggestion: Air exchange rate is running at ${activeState.fan === 1 ? '4.0' : activeState.fan === 2 ? '8.5' : '12.0'} ACH. Current CO₂ load is optimal at ${activeState.co2} ppm. Standard Auto Mode is highly sufficient for this baseline.`;
             }
           }
 
@@ -1560,7 +1641,7 @@ document.addEventListener('DOMContentLoaded', () => {
         scrollChatToBottom();
         setTimeout(() => {
           indicator.style.display = 'none';
-          appendChatMessage('assistant', `🧬 **Chemical Analysis**: Active Room TVOC reading is **${activeState.tvoc} Index** (Optimal range <= 150). Gas sensor matrix reports zero hazardous clinical chemical VOC anomalies. Ventilation level is secure.`);
+          appendChatMessage('assistant', `🧬 Chemical Analysis: Active Room TVOC reading is ${activeState.tvoc} Index (Optimal range <= 150). Gas sensor matrix reports zero hazardous clinical chemical VOC anomalies. Ventilation level is secure.`);
           scrollChatToBottom();
         }, 1200);
       };
