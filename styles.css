@@ -123,6 +123,7 @@ body {
   display: flex;
   flex-direction: column;
   border: 1px solid rgba(255, 255, 255, 0.03);
+  padding-top: 16px; /* Premium spacing below curved corners */
 }
 
 /* Home Gesture Indicator at bottom of screen */
@@ -1109,11 +1110,7 @@ input:checked + .slider:before {
   .phone-screen {
     border-radius: 0;
     border: none;
-  }
-  
-  .status-bar {
-    padding-top: calc(env(safe-area-inset-top) + 8px);
-    height: calc(env(safe-area-inset-top) + 48px);
+    padding-top: env(safe-area-inset-top); /* Native mobile device status bar protection */
   }
   
   .bottom-nav {
