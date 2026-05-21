@@ -1,5 +1,5 @@
 /**
- * AEROGUARD MOBILE UI PROTOTYPE - INTERACTION LOGIC
+ * qAMI MOBILE UI PROTOTYPE - INTERACTION LOGIC
  * Powered by Vanilla JS, Chart.js, & Lucide Icons
  */
 
@@ -1028,7 +1028,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.setAttribute('href', url);
-        link.setAttribute('download', `AeroGuard_${currentRoomKey}_${activeParam}_trends.csv`);
+        link.setAttribute('download', `qAMI_${currentRoomKey}_${activeParam}_trends.csv`);
         link.click();
       });
     }
@@ -1215,7 +1215,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const toggleTheme = document.getElementById('toggleTheme');
 
     // Check localStorage cache on load
-    const savedTheme = localStorage.getItem('aeroguard-theme');
+    const savedTheme = localStorage.getItem('qami-theme');
     if (savedTheme === 'light') {
       document.body.classList.add('light-mode');
       if (toggleTheme) toggleTheme.checked = true;
@@ -1231,12 +1231,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const isLight = toggleTheme.checked;
         if (isLight) {
           document.body.classList.add('light-mode');
-          localStorage.setItem('aeroguard-theme', 'light');
+          localStorage.setItem('qami-theme', 'light');
           syncChartTheme(true);
           showNotificationOverlay("Soft clinical light theme active.");
         } else {
           document.body.classList.remove('light-mode');
-          localStorage.setItem('aeroguard-theme', 'dark');
+          localStorage.setItem('qami-theme', 'dark');
           syncChartTheme(false);
           showNotificationOverlay("Deep space dark theme active.");
         }
@@ -1502,10 +1502,171 @@ document.addEventListener('DOMContentLoaded', () => {
           updateAiDiagnosticsUI();
 
           showNotificationOverlay("Smart parameters applied across all layouts.");
-
         }, 1000);
       });
     });
+
+    // ==========================================================================
+    // DEVICE DISCOVERY & PROVISIONING WORKFLOW
+    // ==========================================================================
+    const addDeviceBtn = document.getElementById('addDeviceBtn');
+    const deviceModalOverlay = document.getElementById('deviceModalOverlay');
+    const deviceModal = document.getElementById('deviceModal');
+    const closeDeviceModalBtn = document.getElementById('closeDeviceModalBtn');
+    const pairDeviceBtn = document.getElementById('pairDeviceBtn');
+    const scannerStateContainer = document.getElementById('scannerStateContainer');
+    const discoveredStateContainer = document.getElementById('discoveredStateContainer');
+
+    let scanningTimeout = null;
+
+    if (addDeviceBtn && deviceModalOverlay && deviceModal) {
+      // 1. Open Modal and start scanner
+      addDeviceBtn.addEventListener('click', () => {
+        triggerHaptic(15);
+        deviceModalOverlay.classList.add('open');
+        deviceModal.classList.add('open');
+
+        // Reset state elements to scanning state
+        scannerStateContainer.style.display = 'flex';
+        discoveredStateContainer.style.display = 'none';
+
+        // Clear any old timeout
+        if (scanningTimeout) clearTimeout(scanningTimeout);
+
+        // 1.8s delay before device discovery
+        scanningTimeout = setTimeout(() => {
+          scannerStateContainer.style.display = 'none';
+          discoveredStateContainer.style.display = 'flex';
+          triggerHaptic([30, 40, 30]); // double heartbeat haptic
+          if (typeof lucide !== 'undefined') lucide.createIcons();
+        }, 1800);
+      });
+
+      // 2. Close Modal triggers
+      const closeModal = () => {
+        deviceModalOverlay.classList.remove('open');
+        deviceModal.classList.remove('open');
+        if (scanningTimeout) {
+          clearTimeout(scanningTimeout);
+          scanningTimeout = null;
+        }
+      };
+
+      if (closeDeviceModalBtn) {
+        closeDeviceModalBtn.addEventListener('click', () => {
+          triggerHaptic(8);
+          closeModal();
+        });
+      }
+
+      deviceModalOverlay.addEventListener('click', () => {
+        closeModal();
+      });
+
+      // 3. Pair and Provision Action
+      if (pairDeviceBtn) {
+        pairDeviceBtn.addEventListener('click', () => {
+          triggerHaptic([40, 60, 40]);
+          pairDeviceBtn.classList.add('loading');
+          pairDeviceBtn.innerHTML = '<i data-lucide="loader" class="spin-slow"></i><span>Provisioning...</span>';
+          if (typeof lucide !== 'undefined') lucide.createIcons();
+
+          setTimeout(() => {
+            // Provision Room Data
+            ROOM_DATA.nicu_2 = {
+              name: "Neo-Natal ICU Ward 2",
+              score: 97,
+              status: "STERILE STATE",
+              cfu: 3,
+              co2: 405,
+              pm25: 2.1,
+              tvoc: 75,
+              temp: 22.8,
+              humid: 45,
+              uv: true,
+              fan: 2, // Auto
+              silent: true,
+              co2Threshold: 550,
+              pm25Threshold: 8.0,
+              filterLife: 99
+            };
+
+            // Provision Database records for other components
+            CHART_DATABASE.nicu_2 = {
+              cfu: {
+                '24h': { labels: ['08:00', '12:00', '16:00', '20:00', '00:00', '04:00'], values: [3, 2, 4, 3, 5, 3] },
+                '7d': { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], values: [4, 3, 3, 5, 4, 2, 3] },
+                '30d': { labels: ['Wk 1', 'Wk 2', 'Wk 3', 'Wk 4'], values: [5, 4, 3, 3] }
+              },
+              pm25: {
+                '24h': { labels: ['08:00', '12:00', '16:00', '20:00', '00:00', '04:00'], values: [1.8, 2.2, 2.4, 2.0, 1.8, 1.9] },
+                '7d': { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], values: [2.2, 2.0, 2.3, 2.6, 2.4, 1.7, 2.1] },
+                '30d': { labels: ['Wk 1', 'Wk 2', 'Wk 3', 'Wk 4'], values: [2.7, 2.4, 2.2, 2.0] }
+              },
+              co2: {
+                '24h': { labels: ['08:00', '12:00', '16:00', '20:00', '00:00', '04:00'], values: [400, 405, 410, 406, 402, 404] },
+                '7d': { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], values: [405, 412, 408, 415, 410, 402, 405] },
+                '30d': { labels: ['Wk 1', 'Wk 2', 'Wk 3', 'Wk 4'], values: [415, 410, 406, 405] }
+              },
+              tvoc: {
+                '24h': { labels: ['08:00', '12:00', '16:00', '20:00', '00:00', '04:00'], values: [70, 75, 77, 73, 71, 72] },
+                '7d': { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], values: [75, 77, 73, 79, 76, 70, 73] },
+                '30d': { labels: ['Wk 1', 'Wk 2', 'Wk 3', 'Wk 4'], values: [80, 76, 74, 73] }
+              }
+            };
+
+            HISTORICAL_LOGS_DB.nicu_2 = [
+              { type: 'safe', title: 'Clinical Pairing Active', desc: 'qAMI Device paired and registered under Biomoneta ZeBox specifications.', time: 'Just now', val: 'Paired' },
+              { type: 'safe', title: 'Zone Ingress Sterile', desc: 'HEPA particle barriers engaged. Estimated biological load is 3 CFU/m³.', time: '1 min ago', val: '3 CFU' },
+              { type: 'info', title: 'Acoustic Compliance Audit', desc: 'ZeBox fan adjusted to silent mode, capping noise index below 32dB.', time: '1 min ago', val: 'Silent' }
+            ];
+
+            AI_RECOMMENDATIONS_DB.nicu_2 = [
+              {
+                id: "nicu_2_sterile",
+                type: "safe",
+                title: "Provisioned Zone Operational",
+                desc: "Pathogen score is 97% (Sterile). Continuous HEPA filtration is active in Ward 2 with Silent Protection enabled.",
+                icon: "shield-check",
+                actionText: "Run Safety Diagnostics",
+                actionType: "info"
+              }
+            ];
+
+            // Dynamic DOM injection of Room Pills
+            document.querySelectorAll('.room-pills').forEach(pillsContainer => {
+              if (pillsContainer.querySelector('[data-room="nicu_2"]')) return;
+
+              const newPill = document.createElement('button');
+              newPill.className = 'room-pill';
+              newPill.setAttribute('data-room', 'nicu_2');
+              newPill.textContent = 'NICU Ward 2';
+              pillsContainer.appendChild(newPill);
+
+              // Attach click event to this specific pill
+              newPill.addEventListener('click', () => {
+                loadRoomState('nicu_2');
+                triggerHaptic(10);
+              });
+            });
+
+            // Set paired state button back to original representation
+            pairDeviceBtn.classList.remove('loading');
+            pairDeviceBtn.innerHTML = '<i data-lucide="link-2"></i><span>Pair & Provision</span>';
+
+            // Close the modal cleanly
+            closeModal();
+
+            // Direct load room state immediately
+            loadRoomState('nicu_2');
+
+            // Dispatch dynamic glass connection success toast
+            showNotificationOverlay("Device SN: AG-9912 connected. Provisioned zone 'Neo-Natal ICU Ward 2' successfully.");
+
+          }, 1200);
+        });
+      }
+    }
   }
 
   function showNotificationOverlay(msg) {
@@ -1552,7 +1713,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="chat-message assistant">
         <div class="chat-avatar">AI</div>
         <div class="chat-text">
-          Hello! I am AeroGuard Copilot. I scan the real-time physical indices of clinical zones. Ask me anything about room air safety diagnostics.
+          Hello! I am qAMI Copilot. I scan the real-time physical indices of clinical zones. Ask me anything about room air safety diagnostics.
         </div>
       </div>
     `;

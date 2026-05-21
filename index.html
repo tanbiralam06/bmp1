@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>AeroGuard - Mobile UI Prototype</title>
+  <title>qAMI - Mobile UI Prototype</title>
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,6 +24,8 @@
       <!-- Screen Content Frame -->
       <div class="phone-screen">
 
+
+
         <!-- MAIN APP CONTENT VIEW -->
         <div class="app-main-viewport">
 
@@ -32,10 +34,15 @@
             
             <!-- Quick Selection Carousel / Room Filter -->
             <div class="room-selector-container">
-              <div class="selector-label">
-                <i data-lucide="map-pin"></i>
-                <span id="activeRoomLabel">Cloudnine IVF OT</span>
-                <i data-lucide="chevron-down" class="chevron-arrow"></i>
+              <div class="selector-label-row">
+                <div class="selector-label">
+                  <i data-lucide="map-pin"></i>
+                  <span id="activeRoomLabel">Cloudnine IVF OT</span>
+                  <i data-lucide="chevron-down" class="chevron-arrow"></i>
+                </div>
+                <button class="header-action-btn" id="addDeviceBtn" title="Add Device">
+                  <i data-lucide="plus"></i>
+                </button>
               </div>
               <div class="room-pills">
                 <button class="room-pill active" data-room="ivf_ot">IVF OT</button>
@@ -322,7 +329,7 @@
                 <div class="ai-status-header">
                   <div class="ai-copilot-badge">
                     <span class="pulse-dot"></span>
-                    <span>AEROGUARD AI COPILOT</span>
+                    <span>qAMI AI COPILOT</span>
                   </div>
                   <span class="ai-status-pill">ONLINE</span>
                 </div>
@@ -405,7 +412,7 @@
               <div class="mock-chat-input-bar">
                 <div class="mock-input-field">
                   <i data-lucide="message-square" class="input-icon"></i>
-                  <span class="placeholder-text">Ask AeroGuard AI...</span>
+                  <span class="placeholder-text">Ask qAMI AI...</span>
                 </div>
                 <button class="mock-send-btn"><i data-lucide="send"></i></button>
               </div>
@@ -640,11 +647,77 @@
             <!-- Version Signature -->
             <div class="section-container pb-32" style="padding-top: 0; text-align: center;">
               <div style="opacity: 0.45; font-size: 11px; font-family: var(--font-body); letter-spacing: 0.5px; padding-top: 24px;">
-                AeroGuard OS v3.5.12-prod<br>
+                qAMI OS v3.5.12-prod<br>
                 Biomoneta ZeBox Sync Engine
               </div>
             </div>
 
+          </div>
+
+          <!-- Interactive Device Discovery & Pairing Modal Overlay -->
+          <div class="device-modal-overlay" id="deviceModalOverlay"></div>
+          <div class="device-modal" id="deviceModal">
+            <div class="device-modal-header">
+              <h3>Add qAMI Unit</h3>
+              <button class="device-modal-close" id="closeDeviceModalBtn" title="Close"><i data-lucide="x"></i></button>
+            </div>
+            <div class="device-modal-body">
+              <!-- State 1: Pulsing Scanner (Radar scanning) -->
+              <div class="scanner-state-container" id="scannerStateContainer">
+                <div class="radar-pulse-ring-1"></div>
+                <div class="radar-pulse-ring-2"></div>
+                <div class="radar-pulse-ring-3"></div>
+                <div class="radar-center-node">
+                  <i data-lucide="bluetooth" class="radar-bt-icon"></i>
+                </div>
+                <p class="scanner-status-text">Scanning for clinical beacons...</p>
+                <span class="scanner-subtext">Searching Bluetooth & Zigbee channels</span>
+              </div>
+
+              <!-- State 2: Discovered Device details (Initially hidden, revealed after 1.8s) -->
+              <div class="discovered-state-container" id="discoveredStateContainer" style="display: none;">
+                <div class="success-discovered-animation">
+                  <div class="success-wave"></div>
+                  <i data-lucide="check-circle2" class="discovered-icon"></i>
+                </div>
+                <h4 class="discovered-title">qAMI Unit Discovered</h4>
+                
+                <div class="discovered-card">
+                  <div class="discovered-card-header">
+                    <div class="discovered-badge">
+                      <span class="discovered-beacon-dot"></span>
+                      ACTIVE BEACON
+                    </div>
+                    <span class="discovered-signal"><i data-lucide="wifi"></i> 94% Signal</span>
+                  </div>
+                  <div class="discovered-card-body">
+                    <div class="device-avatar">
+                      <i data-lucide="shield" class="avatar-shield-icon"></i>
+                    </div>
+                    <div class="device-details">
+                      <span class="device-model-name">Biomoneta ZeBox</span>
+                      <span class="device-serial-number">SN: AG-9912-ZB</span>
+                      <span class="device-specs">Dual-Filter UV-C Sterilization</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="provisioning-field-group">
+                  <label class="provisioning-label">PROVISION ROOM ZONE</label>
+                  <div class="provisioning-input-wrapper">
+                    <i data-lucide="map-pin" class="input-icon-pin"></i>
+                    <input type="text" class="provisioning-input" id="provisioningZoneName" value="NICU Ward 2" readonly>
+                    <span class="input-lock-badge"><i data-lucide="lock"></i> Locked</span>
+                  </div>
+                  <span class="provisioning-help">Automated zone provisioning based on beacon telemetry database.</span>
+                </div>
+
+                <button class="primary-modal-action" id="pairDeviceBtn">
+                  <i data-lucide="link-2"></i>
+                  <span>Pair & Provision</span>
+                </button>
+              </div>
+            </div>
           </div>
 
           <!-- Bottom Pull-Up Bottom Sheet Panel (e.g. Notifications) -->
