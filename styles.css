@@ -2159,6 +2159,7 @@ input:checked + .slider:before {
 
 .config-range-slider {
   -webkit-appearance: none;
+  appearance: none;
   width: 100%;
   height: 4px;
   border-radius: 10px;
