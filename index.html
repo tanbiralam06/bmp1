@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>AeroGuard - Mobile UI Prototype</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Link Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Layout Container: Simulates a phone frame on desktop, becomes full screen on mobile -->
+  <div class="app-simulator-container">
+    <div class="phone-frame">
+      
+      <!-- Phone Top Notch / Speaker & Camera details -->
+      <div class="phone-notch"></div>
+      
+      <!-- Screen Content Frame -->
+      <div class="phone-screen">
+        
+        <!-- Immersive Native Mobile Status Bar -->
+        <div class="status-bar">
+          <div class="status-time" id="statusTime">19:45</div>
+          <div class="status-icons">
+            <i data-lucide="signal" class="status-icon"></i>
+            <i data-lucide="wifi" class="status-icon"></i>
+            <i data-lucide="battery" class="status-icon-battery"></i>
+          </div>
+        </div>
+
+        <!-- MAIN APP CONTENT VIEW -->
+        <div class="app-main-viewport">
+
+          <!-- Dashboard Content View (Scrollable) -->
+          <div class="scroll-content tab-view active-view" id="dashboardView">
+            
+            <!-- Quick Selection Carousel / Room Filter -->
+            <div class="room-selector-container">
+              <div class="selector-label">
+                <i data-lucide="map-pin"></i>
+                <span id="activeRoomLabel">Cloudnine IVF OT</span>
+                <i data-lucide="chevron-down" class="chevron-arrow"></i>
+              </div>
+              <div class="room-pills">
+                <button class="room-pill active" data-room="ivf_ot">IVF OT</button>
+                <button class="room-pill" data-room="icu_1">ICU Ward 1</button>
+                <button class="room-pill" data-room="nicu">NICU</button>
+                <button class="room-pill" data-room="post_op">Post-Op</button>
+              </div>
+            </div>
+
+            <!-- Main Radial Air Safety Gauge -->
+            <div class="radial-gauge-container">
+              <div class="gauge-glow-effect"></div>
+              <div class="radial-svg-box">
+                <svg viewBox="0 0 200 200" class="progress-ring">
+                  <!-- Background Track -->
+                  <circle class="ring-track" cx="100" cy="100" r="85"></circle>
+                  <!-- Foreground Animated Track -->
+                  <circle class="ring-fill" id="safetyGaugeFill" cx="100" cy="100" r="85"></circle>
+                </svg>
+                <div class="gauge-center-content">
+                  <span class="center-label">PATHOGEN SAFETY</span>
+                  <div class="center-value"><span id="safetyScoreText">98</span><span class="percent-symbol">%</span></div>
+                  <span class="center-status" id="safetyStatusText">ULTRA SAFE</span>
+                </div>
+              </div>
+              <div class="gauge-footer-info">
+                <div class="footer-stat">
+                  <i data-lucide="shield-check" class="brand-text"></i>
+                  <span>Bio-Protection Level Active</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quick Action Command Panel -->
+            <div class="section-container">
+              <h2 class="section-title">Smart Air Controls</h2>
+              <div class="controls-grid">
+                
+                <!-- Toggle Card: UV Sterilization -->
+                <div class="control-card" id="cardUv">
+                  <div class="control-header">
+                    <div class="icon-frame uv-active">
+                      <i data-lucide="zap" class="control-icon spin-slow"></i>
+                    </div>
+                    <label class="switch">
+                      <input type="checkbox" id="toggleUv" checked>
+                      <span class="slider round"></span>
+                    </label>
+                  </div>
+                  <div class="control-body">
+                    <h3>UV-C Sterilization</h3>
+                    <p class="status-desc" id="statusTextUv">Active & Sanitizing</p>
+                  </div>
+                </div>
+
+                <!-- Toggle Card: ACH Fan Speed -->
+                <div class="control-card" id="cardFan">
+                  <div class="control-header">
+                    <div class="icon-frame fan-active">
+                      <i data-lucide="fan" class="control-icon spin-fast" id="fanIcon"></i>
+                    </div>
+                    <div class="speed-selector">
+                      <button class="speed-btn" data-speed="1">Min</button>
+                      <button class="speed-btn active" data-speed="2">Auto</button>
+                      <button class="speed-btn" data-speed="3">Max</button>
+                    </div>
+                  </div>
+                  <div class="control-body">
+                    <h3>Air Exchange Rate</h3>
+                    <p class="status-desc" id="statusTextFan">Auto Mode (8.5 ACH)</p>
+                  </div>
+                </div>
+
+                <!-- Toggle Card: Silent Night Shield -->
+                <div class="control-card" id="cardSilent">
+                  <div class="control-header">
+                    <div class="icon-frame">
+                      <i data-lucide="moon" class="control-icon"></i>
+                    </div>
+                    <label class="switch">
+                      <input type="checkbox" id="toggleSilent">
+                      <span class="slider round"></span>
+                    </label>
+                  </div>
+                  <div class="control-body">
+                    <h3>Silent Protection</h3>
+                    <p class="status-desc" id="statusTextSilent">Standard Operation</p>
+                  </div>
+                </div>
+
+                <!-- Card: Active Protection Mode -->
+                <div class="control-card info-card">
+                  <div class="control-header">
+                    <div class="icon-frame brand-bg">
+                      <i data-lucide="activity" class="control-icon pulse-brand"></i>
+                    </div>
+                    <span class="mini-badge-live">LIVE</span>
+                  </div>
+                  <div class="control-body">
+                    <h3>Biomoneta ZeBox</h3>
+                    <p class="status-desc">Device Online & Syncing</p>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Telemetry Parameters Matrix -->
+            <div class="section-container pb-32">
+              <h2 class="section-title">Environmental Telemetry</h2>
+              <div class="telemetry-grid">
+                
+                <!-- Metric Card 1: Bacterial Load -->
+                <div class="telemetry-card">
+                  <div class="card-glow-bg"></div>
+                  <div class="tel-header">
+                    <span class="tel-label">Bacterial Load</span>
+                    <i data-lucide="flask-conical" class="tel-icon"></i>
+                  </div>
+                  <div class="tel-body">
+                    <div class="tel-value"><span id="metricCfu">6</span> <span class="tel-unit">CFU/m³</span></div>
+                    <span class="tel-badge safe">Safe Limit</span>
+                  </div>
+                </div>
+
+                <!-- Metric Card 2: CO2 -->
+                <div class="telemetry-card">
+                  <div class="card-glow-bg"></div>
+                  <div class="tel-header">
+                    <span class="tel-label">Carbon Dioxide</span>
+                    <i data-lucide="cloud" class="tel-icon"></i>
+                  </div>
+                  <div class="tel-body">
+                    <div class="tel-value"><span id="metricCo2">412</span> <span class="tel-unit">ppm</span></div>
+                    <span class="tel-badge safe">Excellent</span>
+                  </div>
+                </div>
+
+                <!-- Metric Card 3: PM 2.5 -->
+                <div class="telemetry-card">
+                  <div class="card-glow-bg"></div>
+                  <div class="tel-header">
+                    <span class="tel-label">PM 2.5 (Fine Dust)</span>
+                    <i data-lucide="wind" class="tel-icon"></i>
+                  </div>
+                  <div class="tel-body">
+                    <div class="tel-value"><span id="metricPm25">3.8</span> <span class="tel-unit">µg/m³</span></div>
+                    <span class="tel-badge safe">Clean Air</span>
+                  </div>
+                </div>
+
+                <!-- Metric Card 4: TVOC -->
+                <div class="telemetry-card">
+                  <div class="card-glow-bg"></div>
+                  <div class="tel-header">
+                    <span class="tel-label">TVOC Index</span>
+                    <i data-lucide="gauge" class="tel-icon"></i>
+                  </div>
+                  <div class="tel-body">
+                    <div class="tel-value"><span id="metricTvoc">88</span> <span class="tel-unit">Index</span></div>
+                    <span class="tel-badge safe">Low VOCs</span>
+                  </div>
+                </div>
+
+                <!-- Metric Card 5: Temp -->
+                <div class="telemetry-card">
+                  <div class="card-glow-bg"></div>
+                  <div class="tel-header">
+                    <span class="tel-label">Temperature</span>
+                    <i data-lucide="thermometer" class="tel-icon"></i>
+                  </div>
+                  <div class="tel-body">
+                    <div class="tel-value"><span id="metricTemp">22.4</span> <span class="tel-unit">°C</span></div>
+                    <span class="tel-badge safe">Optimal</span>
+                  </div>
+                </div>
+
+                <!-- Metric Card 6: Humidity -->
+                <div class="telemetry-card">
+                  <div class="card-glow-bg"></div>
+                  <div class="tel-header">
+                    <span class="tel-label">Humidity</span>
+                    <i data-lucide="droplets" class="tel-icon"></i>
+                  </div>
+                  <div class="tel-body">
+                    <div class="tel-value"><span id="metricHumid">48</span> <span class="tel-unit">% RH</span></div>
+                    <span class="tel-badge safe">Normal</span>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Analytics Content View (Scrollable, Hidden by default) -->
+          <div class="scroll-content tab-view" id="analyticsView" style="display: none;">
+            
+            <!-- Quick Selection Carousel / Room Filter -->
+            <div class="room-selector-container">
+              <div class="selector-label">
+                <i data-lucide="map-pin"></i>
+                <span id="activeRoomLabelAnalytics">Cloudnine IVF OT</span>
+                <i data-lucide="chevron-down" class="chevron-arrow"></i>
+              </div>
+              <div class="room-pills">
+                <button class="room-pill active" data-room="ivf_ot">IVF OT</button>
+                <button class="room-pill" data-room="icu_1">ICU Ward 1</button>
+                <button class="room-pill" data-room="nicu">NICU</button>
+                <button class="room-pill" data-room="post_op">Post-Op</button>
+              </div>
+            </div>
+
+            <!-- Timeframe Filter Pills -->
+            <div class="section-container" style="padding-top: 0; padding-bottom: 8px;">
+              <div class="time-pills">
+                <button class="time-pill active" data-period="24h">24 Hours</button>
+                <button class="time-pill" data-period="7d">7 Days</button>
+                <button class="time-pill" data-period="30d">30 Days</button>
+                <button class="time-pill" data-period="custom">Custom</button>
+              </div>
+            </div>
+
+            <!-- Trends Analytics Graph Card -->
+            <div class="section-container">
+              <div class="analytics-chart-card">
+                <div class="chart-card-header">
+                  <div class="chart-title-area">
+                    <span class="chart-subtitle">HISTORICAL TRENDS</span>
+                    <h3 class="chart-title" id="chartTitleText">Bacterial Load (CFU)</h3>
+                  </div>
+                  <button class="export-report-btn" id="exportReportBtn">
+                    <i data-lucide="download"></i>
+                    <span>Export</span>
+                  </button>
+                </div>
+                
+                <!-- Horizontal Parameter chips selection -->
+                <div class="param-chips">
+                  <button class="param-chip active" data-param="cfu">CFU</button>
+                  <button class="param-chip" data-param="pm25">PM 2.5</button>
+                  <button class="param-chip" data-param="co2">CO₂</button>
+                  <button class="param-chip" data-param="tvoc">TVOC</button>
+                </div>
+
+                <!-- Chart.js canvas element wrapper -->
+                <div class="chart-canvas-wrapper">
+                  <canvas id="trendsChart"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <!-- Historical Activity Logs Feed -->
+            <div class="section-container pb-32">
+              <h2 class="section-title">Historical Log Events</h2>
+              <div class="logs-feed" id="logsFeed">
+                <!-- Will be dynamically populated by JS depending on room -->
+              </div>
+            </div>
+
+          </div>
+
+          <!-- AI Insights & Assistant View (Scrollable, Hidden by default) -->
+          <div class="scroll-content tab-view" id="aiView" style="display: none;">
+            
+            <!-- Quick Selection Room Filter (Synced) -->
+            <div class="room-selector-container">
+              <div class="selector-label">
+                <i data-lucide="map-pin"></i>
+                <span id="activeRoomLabelAi">Cloudnine IVF OT</span>
+                <i data-lucide="chevron-down" class="chevron-arrow"></i>
+              </div>
+              <div class="room-pills">
+                <button class="room-pill active" data-room="ivf_ot">IVF OT</button>
+                <button class="room-pill" data-room="icu_1">ICU Ward 1</button>
+                <button class="room-pill" data-room="nicu">NICU</button>
+                <button class="room-pill" data-room="post_op">Post-Op</button>
+              </div>
+            </div>
+
+            <!-- AI Copilot Status Card -->
+            <div class="section-container" style="padding-bottom: 12px;">
+              <div class="ai-status-card">
+                <div class="ai-status-header">
+                  <div class="ai-copilot-badge">
+                    <span class="pulse-dot"></span>
+                    <span>AEROGUARD AI COPILOT</span>
+                  </div>
+                  <span class="ai-status-pill">ONLINE</span>
+                </div>
+                <div class="ai-status-body">
+                  <h3 class="ai-status-title">Smart Air Diagnostics</h3>
+                  <p class="ai-status-desc">Analyzing real-time sensor streams to evaluate clinical risk metrics.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Diagnostics Parameter Rating Bars -->
+            <div class="section-container" style="padding-top: 0; padding-bottom: 12px;">
+              <div class="ai-diagnostics-panel">
+                <h4 class="panel-subtitle">PARAMETER HEALTH RATINGS</h4>
+                
+                <div class="ai-diagnostic-row">
+                  <div class="diag-meta">
+                    <span>Pathogen Sterility Index</span>
+                    <span class="diag-val" id="aiDiagCfu">0 CFU/m³</span>
+                  </div>
+                  <div class="diag-bar-track">
+                    <div class="diag-bar-fill" id="aiDiagCfuBar" style="width: 100%;"></div>
+                  </div>
+                </div>
+                
+                <div class="ai-diagnostic-row">
+                  <div class="diag-meta">
+                    <span>Ventilation Exchange Efficiency</span>
+                    <span class="diag-val" id="aiDiagAch">8.5 ACH</span>
+                  </div>
+                  <div class="diag-bar-track">
+                    <div class="diag-bar-fill" id="aiDiagAchBar" style="width: 80%;"></div>
+                  </div>
+                </div>
+                
+                <div class="ai-diagnostic-row">
+                  <div class="diag-meta">
+                    <span>Particulate Dust Density</span>
+                    <span class="diag-val" id="aiDiagPm25">3.2 µg/m³</span>
+                  </div>
+                  <div class="diag-bar-track">
+                    <div class="diag-bar-fill" id="aiDiagPm25Bar" style="width: 92%;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Smart Action Recommendation Cards -->
+            <div class="section-container" style="padding-top: 0; padding-bottom: 16px;">
+              <h2 class="section-title">AI Action Recommendations</h2>
+              <div class="ai-recommendations-list" id="aiRecommendationsList">
+                <!-- Dynamically generated action cards -->
+              </div>
+            </div>
+
+            <!-- Dynamic Chat Conversation Feed -->
+            <div class="section-container pb-32" style="padding-top: 0;">
+              <h2 class="section-title">Copilot Smart Chat</h2>
+              <div class="ai-chat-card">
+                <div class="ai-chat-messages" id="aiChatMessages">
+                  <!-- Conversational messages will be injected here -->
+                </div>
+                <div class="chat-typing-indicator" id="chatTypingIndicator">
+                  <span class="typing-dot"></span>
+                  <span class="typing-dot"></span>
+                  <span class="typing-dot"></span>
+                </div>
+              </div>
+              
+              <!-- Quick Prompt chips -->
+              <div class="chat-chips-scroll">
+                <div class="chat-chips">
+                  <button class="chat-chip" data-query="diagnostic">⚡ Run Diagnostics</button>
+                  <button class="chat-chip" data-query="sterile">🛡️ Verify Sterility</button>
+                  <button class="chat-chip" data-query="suggest">💨 Optimize ACH Rate</button>
+                </div>
+              </div>
+
+              <!-- Mock Native iOS/Android style Input bar -->
+              <div class="mock-chat-input-bar">
+                <div class="mock-input-field">
+                  <i data-lucide="message-square" class="input-icon"></i>
+                  <span class="placeholder-text">Ask AeroGuard AI...</span>
+                </div>
+                <button class="mock-send-btn"><i data-lucide="send"></i></button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Settings & Device Configuration View (Scrollable, Hidden by default) -->
+          <div class="scroll-content tab-view" id="settingsView" style="display: none;">
+            
+            <!-- Quick Selection Room Filter (Synced) -->
+            <div class="room-selector-container">
+              <div class="selector-label">
+                <i data-lucide="map-pin"></i>
+                <span id="activeRoomLabelSettings">Cloudnine IVF OT</span>
+                <i data-lucide="chevron-down" class="chevron-arrow"></i>
+              </div>
+              <div class="room-pills">
+                <button class="room-pill active" data-room="ivf_ot">IVF OT</button>
+                <button class="room-pill" data-room="icu_1">ICU Ward 1</button>
+                <button class="room-pill" data-room="nicu">NICU</button>
+                <button class="room-pill" data-room="post_op">Post-Op</button>
+              </div>
+            </div>
+
+            <!-- Device Summary Status Card -->
+            <div class="section-container" style="padding-bottom: 12px;">
+              <div class="device-summary-card">
+                <div class="device-meta-row">
+                  <div class="device-info-left">
+                    <span class="device-model-label">BIOMONETA ZEBOX</span>
+                    <h3 class="device-serial">SN: AG-8842-ZB</h3>
+                  </div>
+                  <span class="calibration-badge green"><span class="calibration-dot"></span>Calibrated</span>
+                </div>
+                
+                <div class="device-grid-stats">
+                  <div class="stat-box">
+                    <span class="stat-box-label">Firmware</span>
+                    <span class="stat-box-val">v3.4.1</span>
+                  </div>
+                  <div class="stat-box">
+                    <span class="stat-box-label">Uptime</span>
+                    <span class="stat-box-val">12d 6h</span>
+                  </div>
+                  <div class="stat-box">
+                    <span class="stat-box-label">Lamp Hours</span>
+                    <span class="stat-box-val">1,420h</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Filter Status Section -->
+            <div class="section-container" style="padding-top: 0; padding-bottom: 12px;">
+              <div class="filter-health-panel">
+                <div class="panel-header-inline">
+                  <h4 class="panel-subtitle-light">HEPA & ACTIVE CARBON FILTER</h4>
+                  <span class="filter-percent" id="filterPercentText">87%</span>
+                </div>
+                <div class="filter-bar-track">
+                  <div class="filter-bar-fill" id="filterBarFill" style="width: 87%;"></div>
+                </div>
+                <div class="filter-details-row">
+                  <span class="filter-estimate">Est. replacement in 244 days</span>
+                  <button class="reset-filter-btn" id="resetFilterBtn">Reset Life</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Threshold Configuration Section -->
+            <div class="section-container" style="padding-top: 0; padding-bottom: 12px;">
+              <h2 class="section-title">Automation Thresholds</h2>
+              <div class="config-settings-card">
+                
+                <!-- CO2 Trigger Limit Slider -->
+                <div class="slider-config-row">
+                  <div class="slider-meta">
+                    <div class="slider-label-group">
+                      <span class="config-item-title">CO₂ Boost Trigger</span>
+                      <span class="config-item-desc">Exchanges increase above limit</span>
+                    </div>
+                    <span class="slider-value-display" id="co2ThresholdVal">600 ppm</span>
+                  </div>
+                  <input type="range" class="config-range-slider" id="co2ThresholdSlider" min="400" max="1000" step="50" value="600">
+                </div>
+
+                <!-- PM2.5 Trigger Limit Slider -->
+                <div class="slider-config-row">
+                  <div class="slider-meta">
+                    <div class="slider-label-group">
+                      <span class="config-item-title">PM2.5 Alert Limit</span>
+                      <span class="config-item-desc">Warning trigger threshold</span>
+                    </div>
+                    <span class="slider-value-display" id="pm25ThresholdVal">12.0 µg</span>
+                  </div>
+                  <input type="range" class="config-range-slider" id="pm25ThresholdSlider" min="5" max="35" step="0.5" value="12.0">
+                </div>
+
+              </div>
+            </div>
+
+            <!-- System Diagnostics & Maintenance Switches -->
+            <div class="section-container" style="padding-top: 0; padding-bottom: 12px;">
+              <h2 class="section-title">Maintenance & Preferences</h2>
+              <div class="maintenance-options-card">
+                
+                <!-- Toggle Item: Haptic Feedback -->
+                <div class="menu-toggle-item">
+                  <div class="menu-item-info">
+                    <span class="menu-item-title">Haptic Tactile Feedback</span>
+                    <span class="menu-item-desc">Vibrate simulator screen on tap</span>
+                  </div>
+                  <label class="switch">
+                    <input type="checkbox" id="toggleHaptics" checked>
+                    <span class="slider round"></span>
+                  </label>
+                </div>
+
+                <!-- Toggle Item: Auto calibration -->
+                <div class="menu-toggle-item">
+                  <div class="menu-item-info">
+                    <span class="menu-item-title">Continuous Autocalibration</span>
+                    <span class="menu-item-desc">Sensor background auto-drift trim</span>
+                  </div>
+                  <label class="switch">
+                    <input type="checkbox" id="toggleCalibration" checked>
+                    <span class="slider round"></span>
+                  </label>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="section-container pb-32" style="padding-top: 0;">
+              <div class="settings-actions-group">
+                <button class="settings-action-btn primary-action-btn" id="btnTestUv">
+                  <i data-lucide="shield-alert"></i>
+                  <span>Test UV-C Lamps</span>
+                </button>
+                <button class="settings-action-btn secondary-action-btn" id="btnRecalibrate">
+                  <i data-lucide="refresh-cw"></i>
+                  <span>Recalibrate Sensors</span>
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Bottom Pull-Up Bottom Sheet Panel (e.g. Notifications) -->
+          <div class="bottom-sheet-overlay" id="bottomSheetOverlay"></div>
+          <div class="bottom-sheet" id="notificationSheet">
+            <div class="sheet-header">
+              <div class="sheet-handle"></div>
+              <h3>Alert & Notifications</h3>
+              <button class="sheet-close-btn" id="sheetCloseBtn"><i data-lucide="x"></i></button>
+            </div>
+            <div class="sheet-content">
+              <div class="notification-item unread">
+                <div class="notif-icon-frame error">
+                  <i data-lucide="alert-triangle"></i>
+                </div>
+                <div class="notif-text">
+                  <h4>PM2.5 Threshold Warning</h4>
+                  <p>PM2.5 levels touched 45 µg/m³ in Post-Op. ZeBox triggered UV-C sanitization boost mode.</p>
+                  <span class="notif-time">2 mins ago</span>
+                </div>
+              </div>
+              <div class="notification-item">
+                <div class="notif-icon-frame success">
+                  <i data-lucide="check-circle2"></i>
+                </div>
+                <div class="notif-text">
+                  <h4>IVF OT Self-Sanitization Complete</h4>
+                  <p>Estimated bacterial load successfully dropped to 0 CFU/m³ following maximum ACH cycle.</p>
+                  <span class="notif-time">1 hour ago</span>
+                </div>
+              </div>
+              <div class="notification-item">
+                <div class="notif-icon-frame info">
+                  <i data-lucide="info"></i>
+                </div>
+                <div class="notif-text">
+                  <h4>System Health Diagnostic OK</h4>
+                  <p>All ZeBox UV-C lamps, fans, and sensors calibrated and verified as operational.</p>
+                  <span class="notif-time">12 hours ago</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Navigation Tab Bar (Simulates Native iOS/Android Tab navigation) -->
+          <nav class="bottom-nav">
+            <a href="#" class="nav-tab active" data-tab="dashboard">
+              <div class="tab-icon-wrapper">
+                <i data-lucide="layout-dashboard"></i>
+              </div>
+              <span class="tab-label">Dashboard</span>
+            </a>
+            <a href="#" class="nav-tab" data-tab="analytics">
+              <div class="tab-icon-wrapper">
+                <i data-lucide="line-chart"></i>
+              </div>
+              <span class="tab-label">Analytics</span>
+            </a>
+            <a href="#" class="nav-tab" data-tab="ai">
+              <div class="tab-icon-wrapper">
+                <i data-lucide="sparkles"></i>
+              </div>
+              <span class="tab-label">AI Assist</span>
+            </a>
+            <a href="#" class="nav-tab" data-tab="settings">
+              <div class="tab-icon-wrapper">
+                <i data-lucide="sliders"></i>
+              </div>
+              <span class="tab-label">Settings</span>
+            </a>
+          </nav>
+
+        </div>
+      </div>
+      
+      <!-- Home Button Bar for Simulating iPhones -->
+      <div class="phone-home-indicator"></div>
+      
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
