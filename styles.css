@@ -293,7 +293,7 @@ body {
 .scroll-content {
   flex: 1;
   overflow-y: auto;
-  padding: 12px 0;
+  padding: 12px 0 100px 0; /* Premium bottom padding to prevent tab bar overlay clipping */
   -webkit-overflow-scrolling: touch;
 }
 
@@ -1118,8 +1118,8 @@ input:checked + .slider:before {
     height: calc(env(safe-area-inset-bottom) + 72px);
   }
   
-  .scroll-content.pb-32 {
-    padding-bottom: calc(env(safe-area-inset-bottom) + 120px) !important;
+  .scroll-content {
+    padding-bottom: calc(env(safe-area-inset-bottom) + 100px) !important; /* Bottom padding protection on real devices */
   }
 }
 
